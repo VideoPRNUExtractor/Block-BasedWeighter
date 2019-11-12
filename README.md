@@ -1,0 +1,1 @@
+PRNU weighting for H264 and HEVC codec.
