@@ -70,6 +70,7 @@ typedef struct KSM_AVMacroBlockInfo {
 	uint32_t mb_x;
 	uint32_t mb_y;
 	uint32_t mb_type;
+	int mb_qp;
 	AVMotionVector MV;
 } KSM_AVMacroBlockInfo;
 
@@ -116,6 +117,7 @@ typedef struct KSM_AV_HEVC_CU_Info {
 	int x;
 	int y;
 	int cb_size;
+	int mb_qp;
 } KSM_AV_HEVC_CU_Info ;
 
 #endif /* AVUTIL_MOTION_VECTOR_H */

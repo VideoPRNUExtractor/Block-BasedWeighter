@@ -1576,7 +1576,7 @@ static int add_mb(AVMotionVector *mb, uint32_t mb_type,
 static int ksm_add_mb_info(KSM_AVMacroBlockInfo *mbi, uint32_t mb_type,
                   int dst_x, int dst_y,
                   int motion_x, int motion_y, int motion_scale,
-                  int direction, uint32_t mb_x, uint32_t mb_y, uint32_t mb_stride )
+                  int direction, uint32_t mb_x, uint32_t mb_y, uint32_t mb_stride,int qp )
 {
 	add_mb(&mbi->MV, mb_type, dst_x, dst_y, motion_x, motion_y, motion_scale, direction);
     int w = IS_8X8(mb_type) || IS_8X16(mb_type) ? 8 : 16;
@@ -1585,6 +1585,7 @@ static int ksm_add_mb_info(KSM_AVMacroBlockInfo *mbi, uint32_t mb_type,
 	mbi->mb_x = dst_x - w/2; //Left top pixel of the MB. make it left top rather than the center.
 	mbi->mb_y = dst_y - h/2; //make it left top rather than the center.
 	mbi->mb_type = mb_type;
+	mbi->mb_qp=qp;
     return 1;
 }
 
@@ -1619,9 +1620,10 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_
         for (mb_y = 0; mb_y < mb_height; mb_y++) {
             for (mb_x = 0; mb_x < mb_width; mb_x++) {
                 int i, direction, mb_type = mbtype_table[mb_x + mb_y * mb_stride];
+                int qp=qscale_table[ mb_x+ mb_y * mb_stride];
                 for (direction = 0; direction < 2; direction++) {
-                    if (!USES_LIST(mb_type, direction))
-                        continue;
+                   //if (!USES_LIST(mb_type, direction))
+                       // continue;
                     if (IS_8X8(mb_type)) {
                         for (i = 0; i < 4; i++) {
                             int sx = mb_x * 16 + 4 + 8 * (i & 1);
@@ -1630,7 +1632,7 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_
                                       (mb_y * 2 + (i >> 1)) * mv_stride) << (mv_sample_log2 - 1);
                             int mx = motion_val[direction][xy][0];
                             int my = motion_val[direction][xy][1];
-                            ksm_add_mb_info(mbiList + mbcount, mb_type, sx, sy, mx, my, scale, direction, mb_x, mb_y, mb_stride);
+                            ksm_add_mb_info(mbiList + mbcount, mb_type, sx, sy, mx, my, scale, direction, mb_x, mb_y, mb_stride,qp);
                             mbcount += add_mb(mvs + mbcount, mb_type, sx, sy, mx, my, scale, direction);
                         }
                     } else if (IS_16X8(mb_type)) {
@@ -1644,7 +1646,7 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_
                             if (IS_INTERLACED(mb_type))
                                 my *= 2;
 
-                            ksm_add_mb_info(mbiList + mbcount, mb_type, sx, sy, mx, my, scale, direction, mb_x, mb_y, mb_stride);
+                            ksm_add_mb_info(mbiList + mbcount, mb_type, sx, sy, mx, my, scale,direction, mb_x, mb_y, mb_stride,qp);
                             mbcount += add_mb(mvs + mbcount, mb_type, sx, sy, mx, my, scale, direction);
                         }
                     } else if (IS_8X16(mb_type)) {
@@ -1658,7 +1660,8 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_
                             if (IS_INTERLACED(mb_type))
                                 my *= 2;
 
-                            ksm_add_mb_info(mbiList + mbcount, mb_type, sx, sy, mx, my, scale, direction, mb_x, mb_y, mb_stride);
+                            ksm_add_mb_info(mbiList + mbcount, mb_type, sx, sy, mx, my, scale, direction, mb_x, mb_y, mb_stride,qp);
+                            //ksm_add_mb_info(mbiList + mbcount, mb_type, sx, sy, mx, my, scale , direction, mb_x, mb_y, mb_stride);
                             mbcount += add_mb(mvs + mbcount, mb_type, sx, sy, mx, my, scale, direction);
                         }
                     } else {
@@ -1667,7 +1670,7 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_
                           int xy = (mb_x + mb_y * mv_stride) << mv_sample_log2;
                           int mx = motion_val[direction][xy][0];
                           int my = motion_val[direction][xy][1];
-                          ksm_add_mb_info(mbiList + mbcount, mb_type, sx, sy, mx, my, scale, direction, mb_x, mb_y, mb_stride);
+                          ksm_add_mb_info(mbiList + mbcount, mb_type, sx, sy, mx, my, scale, direction, mb_x, mb_y, mb_stride,qp);
                           mbcount += add_mb(mvs + mbcount, mb_type, sx, sy, mx, my, scale, direction);
                     }
                 }
@@ -1752,7 +1755,7 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_
                     int count = mbskip_table ? mbskip_table[x + y * mb_stride] : 0;
                     if (count > 9)
                         count = 9;
-                    av_log(avctx, AV_LOG_DEBUG, "%1d", count);
+                    av_log(avctx, AV_LOG_DEBUG, "%1d",count);
                 }
                 if (avctx->debug & FF_DEBUG_QP) {
                     av_log(avctx, AV_LOG_DEBUG, "%2d",
@@ -1925,8 +1928,7 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_
                 }
 #endif
                 if ((avctx->debug & FF_DEBUG_VIS_QP)) {
-                    uint64_t c = (qscale_table[mb_index] * 128 / 31) *
-                                 0x0101010101010101ULL;
+                    uint64_t c = (qscale_table[mb_index] * 128 / 31) *0x0101010101010101ULL;
                     int y;
                     for (y = 0; y < block_height; y++) {
                         *(uint64_t *)(pict->data[1] + 8 * mb_x +

@@ -42,6 +42,8 @@
 #include "mpegutils.h"
 #include "rectangle.h"
 #include "thread.h"
+#include <sys/types.h>
+#include <unistd.h>
 
 static const uint8_t field_scan[16+1] = {
     0 + 0 * 4, 0 + 1 * 4, 1 + 0 * 4, 0 + 2 * 4,

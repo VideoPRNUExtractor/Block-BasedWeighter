@@ -2169,7 +2169,9 @@ static int hls_coding_unit(HEVCContext *s, int x0, int y0, int log2_cb_size)
 
     return 0;
 }
-
+static int f(int *j) {
+  return (*j);;
+}
 static int hls_coding_quadtree(HEVCContext *s, int x0, int y0,
                                int log2_cb_size, int cb_depth)
 {
@@ -2243,24 +2245,31 @@ static int hls_coding_quadtree(HEVCContext *s, int x0, int y0,
         int x_cb   = x0 >> s->ps.sps->log2_min_cb_size;
         int y_cb   = y0 >> s->ps.sps->log2_min_cb_size;
         int x,y;
-
         for (y = 0; y < length; y++){
             for (x = 0; x < length; x++){
 				s->ref->tab_CU_info[(y_cb + y) * s->ps.sps->min_cb_width + x_cb + x].x = lc->cu.x;
 				s->ref->tab_CU_info[(y_cb + y) * s->ps.sps->min_cb_width + x_cb + x].y = lc->cu.y;
-				if (x==0 && y==0){
+				if ((x==0 && y==0)){
 					s->ref->tab_CU_info[(y_cb + y) * s->ps.sps->min_cb_width + x_cb + x].pred_mode = lc->cu.pred_mode;
 					s->ref->tab_CU_info[(y_cb + y) * s->ps.sps->min_cb_width + x_cb + x].part_mode = lc->cu.part_mode;
 					s->ref->tab_CU_info[(y_cb + y) * s->ps.sps->min_cb_width + x_cb + x].intra_split_flag = lc->cu.intra_split_flag;
 					s->ref->tab_CU_info[(y_cb + y) * s->ps.sps->min_cb_width + x_cb + x].cb_size = cb_size;
+
+					FILE *f = fopen("file.txt", "a");
+					s->ref->tab_CU_info[(y_cb + y) * s->ps.sps->min_cb_width + x_cb + x].mb_qp =lc->qp_y;
+					fprintf(f, "%d:%d:%d:%d:%d:\n",s->ref->tab_CU_info[(y_cb + y) * s->ps.sps->min_cb_width + x_cb + x].mb_qp,s->poc,lc->cu.x,lc->cu.y,cb_size);
+					fclose(f);
+
 				}
 				else{
 					s->ref->tab_CU_info[(y_cb + y) * s->ps.sps->min_cb_width + x_cb + x].pred_mode = -1;
 					s->ref->tab_CU_info[(y_cb + y) * s->ps.sps->min_cb_width + x_cb + x].part_mode = -1;
 					s->ref->tab_CU_info[(y_cb + y) * s->ps.sps->min_cb_width + x_cb + x].intra_split_flag = -1;
 					s->ref->tab_CU_info[(y_cb + y) * s->ps.sps->min_cb_width + x_cb + x].cb_size = -1;
+					s->ref->tab_CU_info[(y_cb + y) * s->ps.sps->min_cb_width + x_cb + x].mb_qp=-1;
 
 				}
+
 			}
         }//end first for
         //KSM END
@@ -3011,7 +3020,6 @@ static int hevc_decode_frame(AVCodecContext *avctx, void *data, int *got_output,
         *got_output = ret;
         return 0;
     }
-
     s->ref = NULL;
     ret    = decode_nal_units(s, avpkt->data, avpkt->size);
     if (ret < 0)
@@ -3042,9 +3050,11 @@ static int hevc_decode_frame(AVCodecContext *avctx, void *data, int *got_output,
         s->is_decoded = 0;
     }
 
-    if (s->output_frame->buf[0]) {
-        av_frame_move_ref(data, s->output_frame);
+    if (s->avctx->skip_loop_filter > AVDISCARD_ALL)
+    	s->output_frame=s->frame;
 
+    if (s->output_frame->buf[0]) {
+    	av_frame_move_ref(data, s->output_frame);
         //KSM add side data
         int min_pu_width = s->ps.sps->min_pu_width;
         int min_pu_height = s->ps.sps->min_pu_height;
@@ -3063,8 +3073,8 @@ static int hevc_decode_frame(AVCodecContext *avctx, void *data, int *got_output,
             	puList[y_pu * min_pu_width + x_pu].mvf.mv[1].x = s->ref->tab_mvf[y_pu * min_pu_width + x_pu].mv[1].x;
             	puList[y_pu * min_pu_width + x_pu].mvf.mv[1].y = s->ref->tab_mvf[y_pu * min_pu_width + x_pu].mv[1].y;
             	puList[y_pu * min_pu_width + x_pu].mvf.pred_flag = s->ref->tab_mvf[y_pu * min_pu_width + x_pu].pred_flag;
-            	puList[y_pu * min_pu_width + x_pu].mvf.ref_idx[0] = s->ref->refPicList[0].list[s->ref->tab_mvf[y_pu * min_pu_width + x_pu].ref_idx[0]];
-            	puList[y_pu * min_pu_width + x_pu].mvf.ref_idx[1] = s->ref->refPicList[0].list[s->ref->tab_mvf[y_pu * min_pu_width + x_pu].ref_idx[1]];
+            	//puList[y_pu * min_pu_width + x_pu].mvf.ref_idx[0] = s->ref->refPicList[0].list[s->ref->tab_mvf[y_pu * min_pu_width + x_pu].ref_idx[0]];
+            	//puList[y_pu * min_pu_width + x_pu].mvf.ref_idx[1] = s->ref->refPicList[0].list[s->ref->tab_mvf[y_pu * min_pu_width + x_pu].ref_idx[1]];
             }
         }
 
@@ -3089,6 +3099,7 @@ static int hevc_decode_frame(AVCodecContext *avctx, void *data, int *got_output,
         		cuList[y_cu * min_cb_width + x_cu].x = s->ref->tab_CU_info[y_cu * min_cb_width + x_cu].x;
         		cuList[y_cu * min_cb_width + x_cu].y = s->ref->tab_CU_info[y_cu * min_cb_width + x_cu].y;
         		cuList[y_cu * min_cb_width + x_cu].cb_size = s->ref->tab_CU_info[y_cu * min_cb_width + x_cu].cb_size;
+        		cuList[y_cu * min_cb_width + x_cu].mb_qp = s->ref->tab_CU_info[y_cu * min_cb_width + x_cu].mb_qp;
             }
         }
 
