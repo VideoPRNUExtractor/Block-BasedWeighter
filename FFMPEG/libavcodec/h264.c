@@ -52,6 +52,9 @@
 #include "rectangle.h"
 #include "thread.h"
 #include "vdpau_compat.h"
+#include "stdio.h"
+#include <stdlib.h>
+#include <unistd.h>
 
 static int h264_decode_end(AVCodecContext *avctx);
 
@@ -1327,8 +1330,10 @@ static int h264_decode_frame(AVCodecContext *avctx, void *data,
         if ((ret = ff_h264_field_end(h, &h->slice_ctx[0], 0)) < 0)
             return ret;
 
-        /* Wait for second field. */
-        *got_frame = 0;
+
+        h->next_output_pic=h->cur_pic_ptr;
+
+
         if (h->next_output_pic && ((avctx->flags & AV_CODEC_FLAG_OUTPUT_CORRUPT) ||
                                    (avctx->flags2 & AV_CODEC_FLAG2_SHOW_ALL) ||
                                    h->next_output_pic->recovered)) {

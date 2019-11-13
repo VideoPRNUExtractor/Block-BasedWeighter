@@ -28,7 +28,7 @@
 *
 * above text is based on https://github.com/qemu/qemu/blob/master/scripts/coverity-model.c
 */
-
+#include <stdio.h>
 #define NULL (void *)0
 
 // Based on https://scan.coverity.com/models

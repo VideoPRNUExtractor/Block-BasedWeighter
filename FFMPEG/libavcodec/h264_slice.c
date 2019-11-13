@@ -2090,13 +2090,13 @@ static void loop_filter(const H264Context *h, H264SliceContext *sl, int start_x,
                 sl->chroma_qp[0] = get_chroma_qp(h->ps.pps, 0, h->cur_pic.qscale_table[mb_xy]);
                 sl->chroma_qp[1] = get_chroma_qp(h->ps.pps, 1, h->cur_pic.qscale_table[mb_xy]);
 
-                if (FRAME_MBAFF(h)) {
-                    ff_h264_filter_mb(h, sl, mb_x, mb_y, dest_y, dest_cb, dest_cr,
-                                      linesize, uvlinesize);
-                } else {
-                    ff_h264_filter_mb_fast(h, sl, mb_x, mb_y, dest_y, dest_cb,
-                                           dest_cr, linesize, uvlinesize);
-                }
+					if (FRAME_MBAFF(h)) {
+						ff_h264_filter_mb(h, sl, mb_x, mb_y, dest_y, dest_cb, dest_cr,
+										  linesize, uvlinesize);
+					} else {
+						ff_h264_filter_mb_fast(h, sl, mb_x, mb_y, dest_y, dest_cb,
+											   dest_cr, linesize, uvlinesize);
+					}
             }
     }
     sl->slice_type  = old_slice_type;
