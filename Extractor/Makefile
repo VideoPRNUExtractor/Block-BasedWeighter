@@ -27,9 +27,9 @@ resampling_audio:  LDLIBS += -lm
 .phony: all clean-test clean
 
 ffmpegMake: 
-	$(MAKE) -C /home/lab/Desktop/ws/c/git/FFmpeg
+	$(MAKE) -C ../FFMPEG
 
-all: ffmpegMake $(OBJS) $(EXAMPLES)
+install: ffmpegMake $(OBJS) $(EXAMPLES)
 
 clean-test:
 	$(RM) test*.pgm test.h264 test.mp2 test.sw test.mpg

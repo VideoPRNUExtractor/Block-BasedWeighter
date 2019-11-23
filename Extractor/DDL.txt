@@ -1,0 +1,48 @@
+CREATE  TABLE "DBinfo" (
+version INTEGER
+);
+
+CREATE  TABLE "VIDEO" (
+"CodecID" INTEGER,
+"CodecNameShort" TEXT,
+"CodecNameLong" TEXT,
+"GOPSize" INTEGER,
+"AspectRatioNum" INTEGER,
+"AspectRatioDen" INTEGER
+);
+
+CREATE  TABLE "FRAMEs" (
+"CodedPictureNumber" INTEGER,
+"FrameNumber" INTEGER,
+"PictureType" INTEGER,
+"Width" INTEGER,
+"Height" INTEGER,
+"MinBlockSize" INTEGER,
+"MinBlockWidth" INTEGER,
+"MinBlockHeight" INTEGER,
+"qp" INTEGER
+);
+
+CREATE TABLE "MBs" (
+"FrameID" INTEGER,
+"MBno" INTEGER,
+"MBx" INTEGER,
+"MBy" INTEGER,
+"MBw" INTEGER,
+"MBh" INTEGER,
+"MBtype" INTEGER,
+"partMode" INTEGER
+);
+
+CREATE TABLE "MVs" (
+"MVX" INTEGER,
+"MVY" INTEGER,
+"MVscale" INTEGER,
+"direction" INTEGER,
+"subMBw" INTEGER,
+"subMBh" INTEGER,
+"subMBx" INTEGER,
+"subMBy" INTEGER,
+"parentMBID" INTEGER,
+"parentFrameID" INTEGER
+);
