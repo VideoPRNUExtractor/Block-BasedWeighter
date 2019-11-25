@@ -39,7 +39,7 @@ end
 
 current=cd(extractor);
 %binary file depends on its location. Therefor first change to directory
-system(cell2mat(strcat('./extract_mvs',{' '},videoPath)))
+system(cell2mat(strcat('./extract_mvs',{' '},videoPath,{' '},'1')))
 %extractor runing
 cd(current);
 %back to old directory

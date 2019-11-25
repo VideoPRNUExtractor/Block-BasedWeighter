@@ -46,6 +46,7 @@ static int video_stream_idx = -1;
 static AVFrame *frame = NULL;
 static AVPacket pkt;
 static int video_frame_count = 0;
+static int isDB;
 //SQlite database variable
 static sqlite3 *db;
 static sqlite3_stmt *stmt_mv_insert;
@@ -338,7 +339,7 @@ static int decode_packet(int *got_frame, int cached) {
 
 				video_frame_count++;
 
-				if (*got_frame) {
+				if (*got_frame&&isDB) {
 					int i;
 					AVFrameSideData *sd;
 					AVFrameSideData *sdMBinfo;
@@ -646,7 +647,12 @@ int finilize_db(void) {
 
 int main(int argc, char **argv) {
 
+	 if (argc != 3) {
+	 fprintf(stderr, "Usage: %s <video> <isDB>\n", argv[0]);
+	 exit(1);
+	 }
 	char *src_video = argv[1];
+	isDB=atoi(argv[2]);
 	int ret = 0, got_frame, rc;
 	video_frame_count = 0;
 
@@ -665,10 +671,6 @@ int main(int argc, char **argv) {
 		printf("DB has been initialized.\n");
 	}
 	
-	 if (argc != 2) {
-	 fprintf(stderr, "Usage: %s <video>\n", argv[0]);
-	 exit(1);
-	 }
 	sprintf(src_filename, "%s", src_video);
 
 	av_register_all();
