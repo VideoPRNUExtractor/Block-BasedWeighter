@@ -56,7 +56,7 @@ FFMPEG:  	modified FFMPEG libraries
 
 ### Loop Filter Compansation
 
-Extractor takes two input, first one is a video path with its name and integer database control variable. If this variable equals 0, database information not saving to the database, otherwise it is save all video information to the database.
+Extractor takes two input, first one is a video path with its name and second one is an integer database control variable. If this variable equals 0, it does not save database information to the database, otherwise it saves all video information to the database.
 
 - This function creates a folder with appaned a "Frame" string to video's path. This folder containes loop filter compansated frames of video.
 - Example usage of extractor without database information  can be obtained running `./extract_mvs video_path 0`.
