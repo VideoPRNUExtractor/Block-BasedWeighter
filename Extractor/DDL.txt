@@ -19,8 +19,7 @@ CREATE  TABLE "FRAMEs" (
 "Height" INTEGER,
 "MinBlockSize" INTEGER,
 "MinBlockWidth" INTEGER,
-"MinBlockHeight" INTEGER,
-"qp" INTEGER
+"MinBlockHeight" INTEGER
 );
 
 CREATE TABLE "MBs" (
@@ -31,7 +30,8 @@ CREATE TABLE "MBs" (
 "MBw" INTEGER,
 "MBh" INTEGER,
 "MBtype" INTEGER,
-"partMode" INTEGER
+"partMode" INTEGER,
+"qp" INTEGER
 );
 
 CREATE TABLE "MVs" (
