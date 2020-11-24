@@ -69,9 +69,14 @@ You can open getFingerprintWeighted.m in Matlab. This function extracts both loo
 - The function has 3 input values for respectively video path, extractor path, and weight values.
 - The function returns weighted fingerprint.
 
+### Dataset
+
+Dataset described in Ref [3] can be found at [Dataset](https://drive.google.com/file/d/1hkgXvQDOxokGrLKQaaROt45AKOz25FiZ/view?usp=sharing). This dataset contains 47 videos captured using various Android smartphone cameras through a custom built camera app that allows capturing videos at the highest possible bitrate  (i.e., corresponding to QP=1) while turning off stabilization and electronic zoom to correctly determine the weighting function without interference from other incamera post-processing. All videos include indoor scenes captured  under  natural light by moving the cameras at the highest supported frame resolution of the camera by limiting the duration of each video to 4 seconds.
+
 ## References
 
 Ref [1]: E. Altınışık, K. Taşdemir, and H. T. Sencar, "Mitigation of H.264 and H.265 Video Compression for Reliable PRNU Estimation” IEEE Transactions on Information Forensics and Security, 2019. [.PDF](https://ieeexplore.ieee.org/document/8854840 ".PDF")
 
-Ref [2]: E. Altınışık, and H. T. Sencar, "Source Camera Attribution from Strongly Stabilized Videos”arXiv preprint, 2019. [.PDF](https://arxiv.org/abs/1912.05018 ".PDF") 
+Ref [2]: E. Altınışık, and H. T. Sencar, "Source Camera Verification for Strongly Stabilized Videos." IEEE Transactions on Information Forensics and Security 16 (2020). [.PDF](https://ieeexplore.ieee.org/abstract/document/9169924 ".PDF") 
 
+Ref [3]: E. Altınışık, K. Taşdemir, and H. T. Sencar,  "PRNU Estimation from Encoded Videos Using Block-Based Weighting." arXiv preprint arXiv:2008.08138 [.PDF](https://arxiv.org/pdf/2008.08138.pdf ".PDF")
