@@ -1619,11 +1619,15 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_
 
         for (mb_y = 0; mb_y < mb_height; mb_y++) {
             for (mb_x = 0; mb_x < mb_width; mb_x++) {
-                int i, direction, mb_type = mbtype_table[mb_x + mb_y * mb_stride];
+                int i,mbSave, direction, mb_type = mbtype_table[mb_x + mb_y * mb_stride];
                 int qp=qscale_table[ mb_x+ mb_y * mb_stride];
                 for (direction = 0; direction < 2; direction++) {
                    //if (!USES_LIST(mb_type, direction))
                        // continue;
+                	if (IS_SKIP(mb_type))
+                		mbSave=-123;
+                	else
+                		mbSave=mb_type;
                     if (IS_8X8(mb_type)) {
                         for (i = 0; i < 4; i++) {
                             int sx = mb_x * 16 + 4 + 8 * (i & 1);
@@ -1632,8 +1636,8 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_
                                       (mb_y * 2 + (i >> 1)) * mv_stride) << (mv_sample_log2 - 1);
                             int mx = motion_val[direction][xy][0];
                             int my = motion_val[direction][xy][1];
-                            ksm_add_mb_info(mbiList + mbcount, mb_type, sx, sy, mx, my, scale, direction, mb_x, mb_y, mb_stride,qp);
-                            mbcount += add_mb(mvs + mbcount, mb_type, sx, sy, mx, my, scale, direction);
+                            ksm_add_mb_info(mbiList + mbcount, mbSave, sx, sy, mx, my, scale, direction, mb_x, mb_y, mb_stride,qp);
+                            mbcount += add_mb(mvs + mbcount, mbSave, sx, sy, mx, my, scale, direction);
                         }
                     } else if (IS_16X8(mb_type)) {
                         for (i = 0; i < 2; i++) {
@@ -1646,8 +1650,8 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_
                             if (IS_INTERLACED(mb_type))
                                 my *= 2;
 
-                            ksm_add_mb_info(mbiList + mbcount, mb_type, sx, sy, mx, my, scale,direction, mb_x, mb_y, mb_stride,qp);
-                            mbcount += add_mb(mvs + mbcount, mb_type, sx, sy, mx, my, scale, direction);
+                            ksm_add_mb_info(mbiList + mbcount, mbSave, sx, sy, mx, my, scale,direction, mb_x, mb_y, mb_stride,qp);
+                            mbcount += add_mb(mvs + mbcount, mbSave, sx, sy, mx, my, scale, direction);
                         }
                     } else if (IS_8X16(mb_type)) {
                         for (i = 0; i < 2; i++) {
@@ -1660,9 +1664,9 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_
                             if (IS_INTERLACED(mb_type))
                                 my *= 2;
 
-                            ksm_add_mb_info(mbiList + mbcount, mb_type, sx, sy, mx, my, scale, direction, mb_x, mb_y, mb_stride,qp);
+                            ksm_add_mb_info(mbiList + mbcount, mbSave, sx, sy, mx, my, scale, direction, mb_x, mb_y, mb_stride,qp);
                             //ksm_add_mb_info(mbiList + mbcount, mb_type, sx, sy, mx, my, scale , direction, mb_x, mb_y, mb_stride);
-                            mbcount += add_mb(mvs + mbcount, mb_type, sx, sy, mx, my, scale, direction);
+                            mbcount += add_mb(mvs + mbcount, mbSave, sx, sy, mx, my, scale, direction);
                         }
                     } else {
                           int sx = mb_x * 16 + 8;
@@ -1670,8 +1674,8 @@ void ff_print_debug_info2(AVCodecContext *avctx, AVFrame *pict, uint8_t *mbskip_
                           int xy = (mb_x + mb_y * mv_stride) << mv_sample_log2;
                           int mx = motion_val[direction][xy][0];
                           int my = motion_val[direction][xy][1];
-                          ksm_add_mb_info(mbiList + mbcount, mb_type, sx, sy, mx, my, scale, direction, mb_x, mb_y, mb_stride,qp);
-                          mbcount += add_mb(mvs + mbcount, mb_type, sx, sy, mx, my, scale, direction);
+                          ksm_add_mb_info(mbiList + mbcount, mbSave, sx, sy, mx, my, scale, direction, mb_x, mb_y, mb_stride,qp);
+                          mbcount += add_mb(mvs + mbcount, mbSave, sx, sy, mx, my, scale, direction);
                     }
                 }
             }
