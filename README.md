@@ -73,5 +73,5 @@ You can open getFingerprintWeighted.m in Matlab. This function extracts both loo
 
 Ref [1]: E. Altınışık, K. Taşdemir, and H. T. Sencar, "Mitigation of H.264 and H.265 Video Compression for Reliable PRNU Estimation” IEEE Transactions on Information Forensics and Security, 2019. [.PDF](https://ieeexplore.ieee.org/document/8854840 ".PDF")
 
-Ref [2]: E. Altınışık, and H. T. Sencar, "Source Camera Attribution from Strongly Stabilized Videos”arXiv preprint, 2019. [.PDF]
+Ref [2]: E. Altınışık, and H. T. Sencar, "Source Camera Attribution from Strongly Stabilized Videos”arXiv preprint, 2019. [.PDF](https://arxiv.org/abs/1912.05018 ".PDF") 
 
